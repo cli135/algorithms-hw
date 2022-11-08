@@ -2,9 +2,9 @@
 // 11-2-2022
 // intro algos fall 2022
 
-public class CountInversionsReformattedCode {
+public class CountSignificantInversions {
 
-    public static int countInversions(int[] arr) {
+    public static int countSignificantInversions(int[] arr) {
         return sortAndMerge(arr, 0, arr.length);
     }
 
