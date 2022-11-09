@@ -10,80 +10,83 @@ public class CountSignificantInversions {
 
     /**
      * Runs mergesort on arr from start (inclusive)
-     * to end (exclusive). Returns the number of inversions
-     * detected in the left half, the right half, and the
+     * to end (exclusive). Returns the number of significant
+     * inversions detected in the left half, the right half, and the
      * overall merge operation of both halves.
      *
      * @param arr   the array to be sorted
      * @param start the start index (inclusive) of the portion
      * @param end   the end index (exclusive) of the portion
-     * @return the total number of inversions detected in array
-     *         from [start, end), including inversions detected at
-     *         deeper levels of recursion
+     * @return the total number of significant inversions detected in array
+     *         from [start, end), including significant inversions
+     *         detected at deeper levels of recursion
      */
     private static int sortAndMerge(int[] arr, int start, int end) {
-        // base case, already sorted, no inversions
+        // base case, already sorted, no significant inversions
         if (end - start <= 1) {
             return 0;
         }
         // Recurrence relation for recursive case:
         // T(N) <= 2T(N/2) + O(N)
-        // counting inversions in each half
+        // counting significant inversions in each half
         int mid = start + (end - start) / 2;
         int left = sortAndMerge(arr, start, mid);
         int right = sortAndMerge(arr, mid, end);
-        // and counting inversions when merging in O(n) time
+        // and counting significant inversions and merging in O(2n) == O(n) time
         int inversionsWhenMerging = countAndMerge(arr, start, end);
-        return left + right + inversionsWhenMerging; // total inversions
+        // total significant inversions
+        return left + right + inversionsWhenMerging;
     }
 
     /**
-     * Merges the two sorted halves of the array from
+     * Counts the number of significant inversions between
+     * both halves of this array (only at this level), and
+     * merges the two sorted halves of the array from
      * [start, mid) and [mid, end).
-     * Returns the number of inversions detected during
-     * the merge operation of both halves only at this level.
+     * Returns the number of significant inversions detected
+     * between both sorted halves of the array before the
+     * merge operation of both halves (only at this level).
      *
      * @param arr   the array to be sorted
      * @param start the start index (inclusive) of the portion
      * @param end   the end index (exclusive) of the portion
-     * @return the number of inversions detected in array
+     * @return the number of significant inversions detected in array
      *         from [start, end) when merging two halves in [start, end)
      */
     private static int countAndMerge(int[] arr, int start, int end) {
-        // mergesort merge operation, with just one caveat
-        // an additional if-statement check
-        // to check for multiple inversions at a time (by transitivity)
         int mid = start + (end - start) / 2;
+        // 1. counting significant inversions
         int l = start;
         int r = mid;
-        int countInversionsWhenMerging = 0;
-        int[] merged = new int[end - start];
+        // significant inversions
+        int countSignificantInversions = 0;
         // 1st pass significant inversion check
         while (l < mid && r < end) {
             if (arr[l] > 2 * arr[r]) {
-                countInversionsWhenMerging += mid - l;
-                r++;
-            }
-            else {
-                l++;
-            }
-        }
-        l = start;
-        r = mid;
-        // 2nd pass merge
-        while (l < mid && r < end) {
-            // ------------------------------
-            // The only change between counting inversions and significant inversions
-            // is the line of code below
-            // Normal inversions would be if (arr[l] > arr[r])
-            // ------------------------------
-            if (arr[l] > arr[r]) { // inversions
-                // inversion detected
-                // copying right value to merged array
-                merged[(l - start) + (r - mid)] = arr[r];
+                // significant inversion detected
+                // counting multiple significant inversions
+                // at a time by transitivity:
                 // mid - l is the number of transitive inversions
                 // we can deduce, i.e. all the elements in left half
                 // even greater than right element we just compared
+                countSignificantInversions += mid - l;
+                r++; // move right pointer
+            }
+            else {
+                // no significant inversion yet
+                l++; // move left pointer
+            }
+        }
+        // 2. mergesort merge operation
+        l = start;
+        r = mid;
+        int[] merged = new int[end - start];
+        // 2nd pass merge
+        while (l < mid && r < end) {
+            if (arr[l] > arr[r]) {
+                // normal inversion detected - for sorting
+                // copying right value to merged array
+                merged[(l - start) + (r - mid)] = arr[r];
                 r++; // moving r pointer along
             } else {
                 // copying left value to merged array
@@ -107,6 +110,6 @@ public class CountSignificantInversions {
         for (int i = 0; i < merged.length; i++) {
             arr[start + i] = merged[i];
         }
-        return countInversionsWhenMerging;
+        return countSignificantInversions;
     }
 }
