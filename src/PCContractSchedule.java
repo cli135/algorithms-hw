@@ -1,6 +1,9 @@
 public class PCContractSchedule {
     public static void main(String[] args) {
-
+        int[] supplyWeights = {11, 9, 9, 12, 12, 12, 12, 9, 9, 11};
+        int r = 1;
+        int c = 10;
+        System.out.println(findContractScheduleOfMinimumCost(supplyWeights, r, c));
     }
 
     /**
@@ -86,7 +89,7 @@ public class PCContractSchedule {
         // assuming that n >= 1
         // explicit base (edge) case to handle n == 0 can be made later
         char[] schedule = new char[n];
-        int i = tracePath[0];
+        int i = 0;
         while (i < n) {
             if (tracePath[i] == 1) {
                 // we picked A just for this week
